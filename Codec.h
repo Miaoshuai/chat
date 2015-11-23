@@ -42,12 +42,12 @@ class LengthHeaderCodec : boost::noncopyable
                     break;
                 }
 
-                else if(buf->readableBytes() >= len + kHeaderLen)
+                else if(buf->readableBytes() >= len + kHeaderLen)//可以读取出完整的消息
                 {
-                    buf->retrieve(kHeaderLen);
+                    buf->retrieve(kHeaderLen);          //可读位置重置
                     muduo::string message(buf->peek(),len);
                     messageCallback_(conn,message,receiveTime);
-                    buf->retrieve(len);
+                    buf->retrieve(len);                 //可读位置重置
 
                 }
                 else
@@ -61,10 +61,10 @@ class LengthHeaderCodec : boost::noncopyable
         void send(muduo::net::TcpConnection *conn,const muduo::StringPiece &message)
         {
             muduo::net::Buffer buf;
-            buf.append(message.data(),message.size());
+            buf.append(message.data(),message.size());//将待发送内容放入buffer中
             int32_t len = static_cast<int32_t>(message.size());
             int32_t be32 = muduo::net::sockets::hostToNetwork32(len);
-            buf.prepend(&be32,sizeof(be32));
+            buf.prepend(&be32,sizeof(be32));    //利用buffer的预留空间直接将4字节的内容长度放在内容之前
             conn->send(&buf);
         }
     private:
