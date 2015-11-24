@@ -27,10 +27,10 @@ class ChatClient : boost::noncopyable
     public:
         ChatClient(EventLoop *loop,const InetAddress &serverAddr)
             :client_(loop,serverAddr,"ChatClient"),
-            codec_(std::bind(&ChatClient::onStringMessage,this,_1,_2,_3))
+            codec_(std::bind(&ChatClient::onStringMessage,this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3))
     {
-        client_.setConnectionCallback(std::bind(&ChatClient::onConnection,this,_1));
-        client_.setMessageCallback(std::bind(&LengthHeaderCodec::onMessage,&codec,_1,_2,_3));
+        client_.setConnectionCallback(std::bind(&ChatClient::onConnection,this,std::placeholders::_1));
+        client_.setMessageCallback(std::bind(&LengthHeaderCodec::onMessage,&codec_,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
         client_.enableRetry();
     }
 
